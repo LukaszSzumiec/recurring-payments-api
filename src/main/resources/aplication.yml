@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: Recurring Payments API
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  flyway:
+    enabled: true
+    url: ${SPRING_DATASOURCE_URL}
+    user: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    schemas: public
+    validate-on-migrate: true
+  jpa:
+    hibernate:
+      dd-auto: update
+    properties:
+      hibernate:
+        format_sql: true
