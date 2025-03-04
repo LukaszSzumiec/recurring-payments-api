@@ -4,6 +4,7 @@ import com.lukaszszumiec.recurring_payments_api.application.dto.CreateSubscripti
 import com.lukaszszumiec.recurring_payments_api.application.service.SubscriptionService;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Subscription;
 import com.lukaszszumiec.recurring_payments_api.domain.model.User;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class SubscriptionController {
     }
 
     @PostMapping
-    public ResponseEntity<Subscription> createSubscription(@AuthenticationPrincipal User user, @RequestBody CreateSubscriptionRequest request){
+    public ResponseEntity<Subscription> createSubscription(@AuthenticationPrincipal User user, @Valid  @RequestBody CreateSubscriptionRequest request){
         return ResponseEntity.ok(subscriptionService.createSubscription(user, request));
     }
 }
