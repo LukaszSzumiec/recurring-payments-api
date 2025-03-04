@@ -2,7 +2,9 @@ package com.lukaszszumiec.recurring_payments_api.application.service;
 
 import com.lukaszszumiec.recurring_payments_api.application.dto.CreateSubscriptionRequest;
 import com.lukaszszumiec.recurring_payments_api.application.dto.SubscriptionResponse;
+import com.lukaszszumiec.recurring_payments_api.application.usecase.CancelSubscriptionUseCase;
 import com.lukaszszumiec.recurring_payments_api.application.usecase.CreateSubscriptionUseCase;
+import com.lukaszszumiec.recurring_payments_api.application.usecase.GetSubscriptionsUseCase;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Subscription;
 import com.lukaszszumiec.recurring_payments_api.domain.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,12 +20,18 @@ public class SubscriptionServiceTest {
 
     private SubscriptionService subscriptionService;
     private CreateSubscriptionUseCase createSubscriptionUseCase;
+    private GetSubscriptionsUseCase getSubscriptionsUseCase;
+    private CancelSubscriptionUseCase cancelSubscriptionUseCase;
 
     @BeforeEach
     void setUp(){
         createSubscriptionUseCase = mock(CreateSubscriptionUseCase.class);
+        getSubscriptionsUseCase = mock(GetSubscriptionsUseCase.class);
+        cancelSubscriptionUseCase = mock(CancelSubscriptionUseCase.class);
         subscriptionService = new SubscriptionService(
-                createSubscriptionUseCase
+                createSubscriptionUseCase,
+                getSubscriptionsUseCase,
+                cancelSubscriptionUseCase
         );
     }
 
