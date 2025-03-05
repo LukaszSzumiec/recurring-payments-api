@@ -44,10 +44,6 @@ public class Subscription {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public User getUser() {
         return user;
     }

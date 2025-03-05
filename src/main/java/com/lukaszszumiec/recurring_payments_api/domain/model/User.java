@@ -32,7 +32,6 @@ public class User {
     public User() {
     }
 
-
     public User(String username, String email, String password, String role) {
         this.username = username;
         this.email = email;
@@ -74,5 +73,9 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<Subscription> getSubscriptions() {
+        return subscriptions;
     }
 }

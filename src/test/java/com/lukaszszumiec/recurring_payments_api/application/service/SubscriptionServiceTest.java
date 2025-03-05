@@ -1,7 +1,6 @@
 package com.lukaszszumiec.recurring_payments_api.application.service;
 
 import com.lukaszszumiec.recurring_payments_api.application.dto.CreateSubscriptionRequest;
-import com.lukaszszumiec.recurring_payments_api.application.dto.SubscriptionResponse;
 import com.lukaszszumiec.recurring_payments_api.application.usecase.CancelSubscriptionUseCase;
 import com.lukaszszumiec.recurring_payments_api.application.usecase.CreateSubscriptionUseCase;
 import com.lukaszszumiec.recurring_payments_api.application.usecase.GetSubscriptionsUseCase;
@@ -9,7 +8,6 @@ import com.lukaszszumiec.recurring_payments_api.domain.model.Subscription;
 import com.lukaszszumiec.recurring_payments_api.domain.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -52,12 +50,3 @@ public class SubscriptionServiceTest {
         verify(createSubscriptionUseCase, times(1)).createSubscription(user, request);
     }
 }
-
-//@SpringBootTest
-//class RecurringPaymentsApiApplicationTests {
-//
-//    @Test
-//    void contextLoads() {
-//    }
-//
-//}
