@@ -14,7 +14,7 @@ The system also includes an admin panel for monitoring transactions and user sub
 ## 🛠️ Setup 
 
 1️⃣ **Clone the repo** 
-``` git clone https://github.com/your-username/recurring-payments-api.git cd recurring-payments-api ``` 
+``` git clone git@github.com:LukaszSzumiec/recurring-payments-api.git && cd recurring-payments-api ``` 
 
 2️⃣ **Run with Docker** 
 ``` docker-compose up ``` 
