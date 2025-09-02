@@ -1,7 +1,5 @@
 package com.lukaszszumiec.recurring_payments_api.application.dto;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDate;
 import java.util.UUID;
 

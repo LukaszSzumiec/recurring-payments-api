@@ -5,18 +5,26 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-  flyway:
-    enabled: true
-    url: ${SPRING_DATASOURCE_URL}
-    user: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    schemas: public
-    validate-on-migrate: true
   jpa:
     hibernate:
       dd-auto: update
+    open-in-view: false
     properties:
-      hibernate:
-        format_sql: true
+      hibernate.format_sql: true
+  flyway:
+    locations: classpath:db/migration
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: 8080
+
+billing:
+  charge-cron: "0 * * * * *"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,mappings

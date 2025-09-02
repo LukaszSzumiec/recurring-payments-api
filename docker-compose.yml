@@ -1,15 +1,33 @@
+# services:
+#   recurring-payments-db:
+#     image: postgres:15
+#     restart: always
+#     environment:
+#       POSTGRES_DB: recurring_payments
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: secret
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:
+
+
+
+
 services:
-  recurring-payments-db:
-    image: postgres:15
-    restart: always
+  db:
+    image: postgres:16
     environment:
-      POSTGRES_DB: recurring_payments
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: recurring
+      POSTGRES_USER: recurring
+      POSTGRES_PASSWORD: recurring
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recurring -d recurring"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
