@@ -6,7 +6,7 @@ import java.util.UUID;
 public class SubscriptionResponse {
     private UUID id;
     private String planName;
-    private double price;
+    private double price; 
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean active;

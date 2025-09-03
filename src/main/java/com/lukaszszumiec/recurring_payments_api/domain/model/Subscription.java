@@ -1,23 +1,33 @@
 package com.lukaszszumiec.recurring_payments_api.domain.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "subscriptions")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Subscription {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(nullable = false)
     private BigDecimal price;
-    private LocalDate nextChargeDate;
+
+    @Column(nullable = false)
     private int billingDayOfMonth;
 
-    public Subscription() {}
-    public Subscription(Long id, User user, BigDecimal price, LocalDate nextChargeDate, int billingDayOfMonth) {
-        this.id = id; this.user = user; this.price = price; this.nextChargeDate = nextChargeDate; this.billingDayOfMonth = billingDayOfMonth;
-    }
-
-    public Long getId() { return id; }                           public void setId(Long id) { this.id = id; }
-    public User getUser() { return user; }                       public void setUser(User user) { this.user = user; }
-    public BigDecimal getPrice() { return price; }               public void setPrice(BigDecimal price) { this.price = price; }
-    public LocalDate getNextChargeDate() { return nextChargeDate; } public void setNextChargeDate(LocalDate nextChargeDate) { this.nextChargeDate = nextChargeDate; }
-    public int getBillingDayOfMonth() { return billingDayOfMonth; } public void setBillingDayOfMonth(int billingDayOfMonth) { this.billingDayOfMonth = billingDayOfMonth; }
+    @Column(nullable = false)
+    private LocalDate nextChargeDate;
 }

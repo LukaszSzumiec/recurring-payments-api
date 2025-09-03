@@ -1,6 +1,7 @@
-package com.lukaszszumiec.recurring_payments_api.application.service;
+package com.lukaszszumiec.recurring_payments_api.application.impl;
 
-import com.lukaszszumiec.recurring_payments_api.application.usecase.CreateSubscriptionUseCase;
+import com.lukaszszumiec.recurring_payments_api.application.SubscriptionService;
+import com.lukaszszumiec.recurring_payments_api.application.dto.CreateSubscriptionCommand;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Subscription;
 import com.lukaszszumiec.recurring_payments_api.domain.model.User;
 import com.lukaszszumiec.recurring_payments_api.domain.port.SubscriptionRepository;
@@ -11,13 +12,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
-public class CreateSubscriptionService implements CreateSubscriptionUseCase {
+public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final UserRepository userRepo;
     private final SubscriptionRepository subRepo;
 
-    public CreateSubscriptionService(UserRepository userRepo,
-            SubscriptionRepository subRepo) {
+    public SubscriptionServiceImpl(UserRepository userRepo, SubscriptionRepository subRepo) {
         this.userRepo = userRepo;
         this.subRepo = subRepo;
     }
@@ -31,12 +31,13 @@ public class CreateSubscriptionService implements CreateSubscriptionUseCase {
         LocalDate today = LocalDate.now();
         LocalDate next = today.withDayOfMonth(Math.min(day, today.lengthOfMonth()));
 
-        Subscription s = new Subscription();
-        s.setUser(user);
-        s.setPrice(new java.math.BigDecimal(cmd.price()));
-        s.setBillingDayOfMonth(day);
-        s.setNextChargeDate(next);
-        return subRepo.save(s);
+        Subscription s = Subscription.builder()
+                .user(user)
+                .price(BigDecimal.valueOf(cmd.price()))
+                .billingDayOfMonth(day)
+                .nextChargeDate(next)
+                .build();
 
+        return subRepo.save(s);
     }
 }

@@ -1,25 +1,34 @@
-CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    full_name VARCHAR(255) NOT NULL
+-- Users
+create table if not exists users (
+  id           bigserial primary key,
+  email        varchar(255) not null unique,
+  full_name    varchar(255) not null
 );
 
-CREATE TABLE subscriptions (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES users(id),
-    price NUMERIC(12,2) NOT NULL,
-    next_charge_date DATE NOT NULL,
-    billing_day_of_month INT NOT NULL
+-- Subscriptions
+create table if not exists subscriptions (
+  id                    bigserial primary key,
+  user_id               bigint not null references users(id) on delete cascade,
+  price                 numeric(12,2) not null,
+  billing_day_of_month  int not null,
+  next_charge_date      date not null,
+  constraint chk_billing_day range (billing_day_of_month) is not null,
+  constraint chk_billing_day_bounds check (billing_day_of_month between 1 and 31)
 );
 
-CREATE TABLE payments (
-    id BIGSERIAL PRIMARY KEY,
-    subscription_id BIGINT NOT NULL REFERENCES subscriptions(id),
-    amount NUMERIC(12,2) NOT NULL,
-    status VARCHAR(32) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT now()
+-- Payments
+create table if not exists payments (
+  id               bigserial primary key,
+  subscription_id  bigint not null references subscriptions(id) on delete cascade,
+  amount           numeric(12,2) not null,
+  status           varchar(16) not null,
+  created_at       timestamp not null default now(),
+  constraint chk_payment_status check (status in ('PENDING','SUCCESS','FAILED'))
 );
 
--- Idempotency (unikalne płatności per subskrypcja + miesiąc)
-CREATE UNIQUE INDEX uk_payment_unique_month
-ON payments (subscription_id, date_trunc('month', created_at));
+-- Helpful indexes
+create index if not exists idx_subscriptions_user on subscriptions(user_id);
+create index if not exists idx_subscriptions_next_date on subscriptions(next_charge_date);
+
+create index if not exists idx_payments_subscription on payments(subscription_id);
+create index if not exists idx_payments_created_at on payments(created_at);

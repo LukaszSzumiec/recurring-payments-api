@@ -23,6 +23,10 @@ server:
 billing:
   charge-cron: "0 * * * * *"
 
+outbox:
+  publish-cron: "*/15 * * * * *"
+  batch-size: 100
+
 management:
   endpoints:
     web:
