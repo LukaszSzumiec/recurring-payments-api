@@ -33,7 +33,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         Subscription s = Subscription.builder()
                 .user(user)
-                .price(BigDecimal.valueOf(cmd.price()))
+                .price(cmd.price())
                 .billingDayOfMonth(day)
                 .nextChargeDate(next)
                 .build();

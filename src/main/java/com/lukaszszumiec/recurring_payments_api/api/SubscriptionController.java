@@ -1,9 +1,10 @@
 package com.lukaszszumiec.recurring_payments_api.api;
 
 import com.lukaszszumiec.recurring_payments_api.api.dto.CreateSubscriptionRequest;
-import com.lukaszszumiec.recurring_payments_api.application.usecase.CreateSubscriptionUseCase;
-import com.lukaszszumiec.recurring_payments_api.application.usecase.GetPaymentsUseCase;
-import com.lukaszszumiec.recurring_payments_api.application.usecase.ProcessPaymentUseCase;
+import com.lukaszszumiec.recurring_payments_api.application.PaymentProcessingService;
+import com.lukaszszumiec.recurring_payments_api.application.PaymentQueryService;
+import com.lukaszszumiec.recurring_payments_api.application.SubscriptionService;
+import com.lukaszszumiec.recurring_payments_api.application.dto.CreateSubscriptionCommand;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Payment;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Subscription;
 import com.lukaszszumiec.recurring_payments_api.domain.port.SubscriptionRepository;
@@ -17,28 +18,30 @@ import java.util.List;
 @RequestMapping("/api/subscriptions")
 public class SubscriptionController {
 
-    private final CreateSubscriptionUseCase createSubscription;
-    private final ProcessPaymentUseCase processPayment;
-    private final GetPaymentsUseCase getPayments;
+    private final SubscriptionService subscriptionService;
+    private final PaymentProcessingService paymentProcessingService;
+    private final PaymentQueryService paymentQueryService;
     private final SubscriptionRepository subscriptionRepository;
 
-    public SubscriptionController(CreateSubscriptionUseCase createSubscription,
-            ProcessPaymentUseCase processPayment,
-            GetPaymentsUseCase getPayments,
-            SubscriptionRepository subscriptionRepository) {
-        this.createSubscription = createSubscription;
-        this.processPayment = processPayment;
-        this.getPayments = getPayments;
+    public SubscriptionController(SubscriptionService subscriptionService,
+                                  PaymentProcessingService paymentProcessingService,
+                                  PaymentQueryService paymentQueryService,
+                                  SubscriptionRepository subscriptionRepository) {
+        this.subscriptionService = subscriptionService;
+        this.paymentProcessingService = paymentProcessingService;
+        this.paymentQueryService = paymentQueryService;
         this.subscriptionRepository = subscriptionRepository;
     }
 
     @PostMapping
     public ResponseEntity<Subscription> create(@Valid @RequestBody CreateSubscriptionRequest req) {
-        var created = createSubscription.create(
-                new CreateSubscriptionUseCase.CreateSubscriptionCommand(
+        var created = subscriptionService.create(
+                new CreateSubscriptionCommand(
                         req.userId(),
                         req.price(),
-                        req.billingDayOfMonth()));
+                        req.billingDayOfMonth()
+                )
+        );
         return ResponseEntity.ok(created);
     }
 
@@ -46,13 +49,12 @@ public class SubscriptionController {
     public ResponseEntity<Void> processNow(@PathVariable Long id) {
         var s = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found: " + id));
-        processPayment.processForSubscription(s);
+        paymentProcessingService.processForSubscription(s);
         return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/user/{userId}/payments")
     public ResponseEntity<List<Payment>> listUserPayments(@PathVariable Long userId) {
-        var payments = getPayments.getByUserId(userId);
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(paymentQueryService.getByUserId(userId));
     }
 }

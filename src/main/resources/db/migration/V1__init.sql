@@ -12,8 +12,8 @@ create table if not exists subscriptions (
   price                 numeric(12,2) not null,
   billing_day_of_month  int not null,
   next_charge_date      date not null,
-  constraint chk_billing_day range (billing_day_of_month) is not null,
-  constraint chk_billing_day_bounds check (billing_day_of_month between 1 and 31)
+  -- NOT NULL jest już na kolumnie, więc dodatkowy constraint niepotrzebny
+  constraint chk_billing_day_bounds check (billing_day_of_month between 1 and 28)
 );
 
 -- Payments
