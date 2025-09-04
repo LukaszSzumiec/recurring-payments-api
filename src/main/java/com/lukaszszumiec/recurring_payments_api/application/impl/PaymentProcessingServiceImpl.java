@@ -63,7 +63,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
         payload.put("subscriptionId", subscription.getId());
         payload.put("status", payment.getStatus().name());
         payload.put("amount", payment.getAmount().toString());
-        outboxRepository.save(
+        outboxRepository.store(
                 OutboxEvent.builder()
                         .aggregateType("Payment")
                         .aggregateId(payment.getId())

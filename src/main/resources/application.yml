@@ -1,3 +1,6 @@
+jwt:
+  secret: superSekretnyKluczJWT123456789012345678901234567890
+  expiration: 3600
 spring:
   application:
     name: Recurring Payments API
@@ -7,7 +10,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
-      dd-auto: update
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate.format_sql: true
@@ -19,7 +22,6 @@ spring:
 
 server:
   port: 8080
-
 billing:
   charge-cron: "0 * * * * *"
 

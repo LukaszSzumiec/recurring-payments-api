@@ -1,25 +1,9 @@
-# services:
-#   recurring-payments-db:
-#     image: postgres:15
-#     restart: always
-#     environment:
-#       POSTGRES_DB: recurring_payments
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: secret
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-
-# volumes:
-#   postgres_data:
-
-
-
+version: "3.9"
 
 services:
   db:
     image: postgres:16
+    container_name: recurring-db
     environment:
       POSTGRES_DB: recurring
       POSTGRES_USER: recurring
@@ -31,3 +15,23 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recurring-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/recurring
+      SPRING_DATASOURCE_USERNAME: recurring
+      SPRING_DATASOURCE_PASSWORD: recurring
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

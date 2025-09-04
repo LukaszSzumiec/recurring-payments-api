@@ -1,12 +1,19 @@
 package com.lukaszszumiec.recurring_payments_api.application.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
 public class SubscriptionResponse {
+    @Setter
+    @Getter
     private UUID id;
+    @Setter
     private String planName;
-    private double price; 
+    @Getter
+    private double price;
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean active;
@@ -20,23 +27,8 @@ public class SubscriptionResponse {
         this.active = active;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getPlanName() {
         return planName;
     }
 
-    public void setPlanName(String planName) {
-        this.planName = planName;
-    }
-
-    public double getPrice() {
-        return price;
-    }
 }
