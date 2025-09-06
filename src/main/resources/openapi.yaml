@@ -1,0 +1,294 @@
+openapi: 3.0.3
+info:
+  title: Recurring Payments API
+  version: 1.0.0
+  description: API for subscriptions and recurring payments (API-first).
+servers:
+  - url: /
+
+tags:
+  - name: Auth
+  - name: Payments
+  - name: Subscriptions
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login (JWT)
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginForm'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginForm'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+              examples:
+                ok:
+                  value: { accessToken: "eyJhbGciOi..." }
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                invalid:
+                  value: { error: "invalid_credentials" }
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsernameResponse' }
+              examples:
+                ok:
+                  value: { username: "test@example.com" }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                unauth:
+                  value: { error: "unauthorized" }
+
+  # ---- Canonical English paths ----
+  /api/users/{userId}/payments:
+    get:
+      tags: [Payments]
+      summary: List payments for a user
+      operationId: listPaymentsForUser
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+          description: User ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Payment' }
+        '401':
+          description: Unauthorized
+
+  /api/subscriptions:
+    post:
+      tags: [Subscriptions]
+      summary: Create a subscription
+      operationId: createSubscription
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSubscriptionRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '400':
+          description: Validation failed
+        '401':
+          description: Unauthorized
+
+  /api/subscriptions/{subscriptionId}/process:
+    post:
+      tags: [Subscriptions]
+      summary: Process payments for a subscription immediately
+      operationId: processSubscriptionNow
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '202':
+          description: Accepted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Subscription not found
+
+  # ---- Deprecated aliases (for migration) ----
+  /api/payments/by-user/{userId}:
+    get:
+      deprecated: true
+      tags: [Payments]
+      summary: "[Deprecated] Use /api/users/{userId}/payments"
+      operationId: listPaymentsByUser_DEPRECATED
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Payment' }
+        '401':
+          description: Unauthorized
+
+  /api/subscriptions/user/{userId}/payments:
+    get:
+      deprecated: true
+      tags: [Subscriptions]
+      summary: "[Deprecated] Use /api/users/{userId}/payments"
+      operationId: listUserPaymentsBySubscriptions_DEPRECATED
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Payment' }
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # === AUTH ===
+    LoginForm:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@example.com
+        password:
+          type: string
+          format: password
+          example: password
+        role:
+          type: string
+          description: Optional fallback role when authorities are empty
+          example: USER
+          default: USER
+
+    TokenResponse:
+      type: object
+      required: [accessToken]
+      properties:
+        accessToken:
+          type: string
+
+    UsernameResponse:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+
+    # === SUBSCRIPTIONS ===
+    CreateSubscriptionRequest:
+      type: object
+      required: [userId, price, billingDayOfMonth]
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        price:
+          # BigDecimal serialized as string to avoid precision loss
+          type: string
+          example: "19.99"
+        billingDayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 28
+          example: 15
+
+    Subscription:
+      type: object
+      required: [id, userId, price, billingDayOfMonth, nextChargeDate]
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+          description: ID of the user (ManyToOne in JPA entity)
+        price:
+          type: string
+          example: "19.99"
+        billingDayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 28
+        nextChargeDate:
+          type: string
+          format: date
+
+    PaymentStatus:
+      type: string
+      enum: [ PENDING, SUCCESS, FAILED ]
+
+
+    # === PAYMENTS ===
+    Payment:
+      type: object
+      required: [id, subscriptionId, amount, status, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        subscriptionId:
+          type: integer
+          format: int64
+          description: ID of the subscription (ManyToOne in JPA entity)
+        amount:
+          type: string
+          example: "19.99"
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        createdAt:
+          type: string
+          format: date-time
