@@ -5,14 +5,18 @@ import lombok.*;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@Entity @Table(name = "refresh_tokens")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "refresh_tokens")
 public class RefreshTokenEntity {
     @Id
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userId;
+    private Long userId;
 
     @Column(nullable = false, unique = true, length = 64)
     private String jti;

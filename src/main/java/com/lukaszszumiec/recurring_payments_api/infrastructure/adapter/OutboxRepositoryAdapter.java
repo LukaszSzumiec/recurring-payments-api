@@ -11,12 +11,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 public interface OutboxRepositoryAdapter
-        extends JpaRepository<OutboxEvent, UUID>, OutboxRepository {
-
+        extends JpaRepository<OutboxEvent, Long>, OutboxRepository {
 
     @Query("select o from OutboxEvent o where o.status = :status order by o.id asc")
     List<OutboxEvent> findByStatusOrderByIdAsc(@Param("status") String status,

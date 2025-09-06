@@ -8,8 +8,8 @@ import com.lukaszszumiec.recurring_payments_api.domain.port.SubscriptionReposito
 import com.lukaszszumiec.recurring_payments_api.domain.port.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
@@ -29,13 +29,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         int day = cmd.billingDayOfMonth();
         LocalDate today = LocalDate.now();
-        LocalDate next = today.withDayOfMonth(Math.min(day, today.lengthOfMonth()));
+        LocalDate target = YearMonth.from(today).atEndOfMonth().withDayOfMonth(Math.min(day, today.lengthOfMonth()));
+        if (target.isBefore(today)) {
+            YearMonth nextYm = YearMonth.from(today).plusMonths(1);
+            target = nextYm.atEndOfMonth().withDayOfMonth(Math.min(day, nextYm.lengthOfMonth()));
+        }
 
         Subscription s = Subscription.builder()
                 .user(user)
                 .price(cmd.price())
                 .billingDayOfMonth(day)
-                .nextChargeDate(next)
+                .nextChargeDate(target)
                 .build();
 
         return subRepo.save(s);

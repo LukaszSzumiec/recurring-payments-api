@@ -1,10 +1,10 @@
 package com.lukaszszumiec.recurring_payments_api.infrastructure.scheduler;
 
 import com.lukaszszumiec.recurring_payments_api.application.PaymentProcessingService;
+import com.lukaszszumiec.recurring_payments_api.config.BillingProperties;
 import com.lukaszszumiec.recurring_payments_api.domain.port.SubscriptionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -19,20 +19,20 @@ public class PaymentScheduler implements SchedulingConfigurer {
 
     private final SubscriptionRepository subscriptionRepository;
     private final PaymentProcessingService paymentProcessingService;
-    private final String cron;
+    private final BillingProperties billingProperties;
 
     public PaymentScheduler(SubscriptionRepository subscriptionRepository,
                             PaymentProcessingService paymentProcessingService,
-                            @Value("${billing.charge-cron:0 * * * * *}") String cron) {
+                            BillingProperties billingProperties) {
         this.subscriptionRepository = subscriptionRepository;
         this.paymentProcessingService = paymentProcessingService;
-        this.cron = cron;
+        this.billingProperties = billingProperties;
     }
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.addCronTask(new CronTask(this::runCharge, cron));
-        log.info("[scheduler] Registered cron task with expression: {}", cron);
+        taskRegistrar.addCronTask(new CronTask(this::runCharge, billingProperties.chargeCron()));
+        log.info("[scheduler] Registered cron task with expression: {}", billingProperties.chargeCron());
     }
 
     private void runCharge() {

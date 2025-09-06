@@ -15,7 +15,7 @@ public interface RefreshTokenRepositoryAdapter extends JpaRepository<RefreshToke
     Optional<RefreshTokenEntity> findByJti(String jti);
 
     @Override
-    default void store(UUID userId, String jti, Instant issuedAt, Instant expiresAt) {
+    default void store(Long userId, String jti, Instant issuedAt, Instant expiresAt) {
         save(new RefreshTokenEntity(UUID.randomUUID(), userId, jti, issuedAt, expiresAt, false));
     }
 
@@ -25,7 +25,7 @@ public interface RefreshTokenRepositoryAdapter extends JpaRepository<RefreshToke
     }
 
     @Override
-    default void revokeAllForUser(UUID userId) {
+    default void revokeAllForUser(Long userId) {
         findAll().stream()
                 .filter(rt -> userId.equals(rt.getUserId()))
                 .filter(rt -> !rt.isRevoked())
