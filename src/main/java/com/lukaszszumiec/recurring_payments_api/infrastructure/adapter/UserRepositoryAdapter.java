@@ -5,7 +5,9 @@ import com.lukaszszumiec.recurring_payments_api.domain.port.UserRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface UserRepositoryAdapter
-        extends JpaRepository<User, Long>, UserRepository {
+public interface UserRepositoryAdapter extends JpaRepository<User, Long>, UserRepository {
+    Optional<User> findByEmail(String email);
 }

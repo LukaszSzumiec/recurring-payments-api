@@ -10,8 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepositoryAdapter
-        extends JpaRepository<RefreshTokenEntity, UUID>, RefreshTokenRepository {
+public interface RefreshTokenRepositoryAdapter extends JpaRepository<RefreshTokenEntity, UUID>, RefreshTokenRepository {
 
     Optional<RefreshTokenEntity> findByJti(String jti);
 

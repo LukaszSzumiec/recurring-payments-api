@@ -29,6 +29,11 @@ outbox:
   publish-cron: "*/15 * * * * *"
   batch-size: 100
 
+logging:
+  level:
+    root: ERROR
+    org.springframework.security: DEBUG
+
 management:
   endpoints:
     web:

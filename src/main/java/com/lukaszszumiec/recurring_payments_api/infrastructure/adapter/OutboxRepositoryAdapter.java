@@ -30,11 +30,8 @@ public interface OutboxRepositoryAdapter
     @Query("update OutboxEvent o set o.status = 'FAILED', o.attempts = :attempts, o.lastAttemptAt = :ts where o.id = :id")
     int updateMarkFailed(@Param("id") Long id, @Param("attempts") int attempts, @Param("ts") LocalDateTime ts);
 
-    // --- Implementacja portu (default methods) ---
-
     @Override
     default OutboxEvent store(OutboxEvent event) {
-        // Tak samo jak w RefreshTokenRepositoryAdapter: używamy save(...) z JpaRepository
         return save(event);
     }
 

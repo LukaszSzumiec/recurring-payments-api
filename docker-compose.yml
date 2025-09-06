@@ -33,5 +33,26 @@ services:
     ports:
       - "8080:8080"
 
+
+  db-seed:
+    image: postgres:16
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    environment:
+      PGPASSWORD: recurring
+    volumes:
+      - ./docker/postgres/seed:/seed:ro
+    entrypoint:
+      - bash
+      - -lc
+      - >
+        until psql -h db -U recurring -d recurring -tAc "select to_regclass('public.users') is not null" | grep -q t;
+        do echo 'waiting for migrations...'; sleep 1; done;
+        psql -h db -U recurring -d recurring -v ON_ERROR_STOP=1 -f /seed/init.sql
+
+
 volumes:
   pgdata:

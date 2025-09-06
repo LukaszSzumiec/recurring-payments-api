@@ -27,8 +27,4 @@ public class SubscriptionResponse {
         this.active = active;
     }
 
-    public String getPlanName() {
-        return planName;
-    }
-
 }

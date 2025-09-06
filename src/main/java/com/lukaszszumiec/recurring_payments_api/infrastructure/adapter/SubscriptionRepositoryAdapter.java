@@ -9,8 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface SubscriptionRepositoryAdapter
-        extends JpaRepository<Subscription, Long>, SubscriptionRepository {
+public interface SubscriptionRepositoryAdapter extends JpaRepository<Subscription, Long>, SubscriptionRepository {
 
     List<Subscription> findByNextChargeDateLessThanEqualOrderByNextChargeDateAsc(LocalDate date);
 
