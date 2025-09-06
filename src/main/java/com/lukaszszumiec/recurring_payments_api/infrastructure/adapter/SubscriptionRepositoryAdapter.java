@@ -12,10 +12,15 @@ import java.util.List;
 public interface SubscriptionRepositoryAdapter extends JpaRepository<Subscription, Long>, SubscriptionRepository {
 
     List<Subscription> findByNextChargeDateLessThanEqualOrderByNextChargeDateAsc(LocalDate date);
+    List<Subscription> findAllByUser_IdOrderByIdAsc(Long userId);
 
     @Override
     default List<Subscription> findAllDueUntil(LocalDate date) {
         return findByNextChargeDateLessThanEqualOrderByNextChargeDateAsc(date);
     }
 
+    @Override
+    default List<Subscription> findAllByUserId(Long userId) {
+        return findAllByUser_IdOrderByIdAsc(userId);
+    }
 }

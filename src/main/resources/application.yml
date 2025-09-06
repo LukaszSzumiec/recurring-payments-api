@@ -1,6 +1,8 @@
 jwt:
   secret: superSekretnyKluczJWT123456789012345678901234567890
   expiration: 3600
+  refresh-expiration: 1209600
+
 spring:
   application:
     name: Recurring Payments API

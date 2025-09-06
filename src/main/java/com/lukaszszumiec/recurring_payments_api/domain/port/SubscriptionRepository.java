@@ -7,8 +7,7 @@ import java.util.Optional;
 
 public interface SubscriptionRepository {
     Subscription save(Subscription s);
-
     Optional<Subscription> findById(Long id);
-
     List<Subscription> findAllDueUntil(LocalDate date);
+    List<Subscription> findAllByUserId(Long userId);
 }

@@ -3,6 +3,8 @@ package com.lukaszszumiec.recurring_payments_api.application.impl;
 import com.lukaszszumiec.recurring_payments_api.application.PaymentQueryService;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Payment;
 import com.lukaszszumiec.recurring_payments_api.domain.port.PaymentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,5 +21,10 @@ public class PaymentQueryServiceImpl implements PaymentQueryService {
     @Override
     public List<Payment> getByUserId(Long userId) {
         return paymentRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public Page<Payment> getByUserId(Long userId, Pageable pageable) {
+        return paymentRepository.findAllByUserId(userId, pageable);
     }
 }

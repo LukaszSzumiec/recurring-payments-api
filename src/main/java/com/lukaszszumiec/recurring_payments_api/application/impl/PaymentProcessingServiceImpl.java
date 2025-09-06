@@ -1,5 +1,6 @@
 package com.lukaszszumiec.recurring_payments_api.application.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lukaszszumiec.recurring_payments_api.application.PaymentProcessingService;
 import com.lukaszszumiec.recurring_payments_api.domain.model.OutboxEvent;
 import com.lukaszszumiec.recurring_payments_api.domain.model.Payment;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -24,15 +24,18 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
     private final SubscriptionRepository subscriptionRepository;
     private final PaymentProvider paymentProvider;
     private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
 
     public PaymentProcessingServiceImpl(PaymentRepository paymentRepository,
-            SubscriptionRepository subscriptionRepository,
-            PaymentProvider paymentProvider,
-            OutboxRepository outboxRepository) {
+                                        SubscriptionRepository subscriptionRepository,
+                                        PaymentProvider paymentProvider,
+                                        OutboxRepository outboxRepository,
+                                        ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.paymentProvider = paymentProvider;
         this.outboxRepository = outboxRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -58,18 +61,27 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
             subscriptionRepository.save(subscription);
         }
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("paymentId", payment.getId());
-        payload.put("subscriptionId", subscription.getId());
-        payload.put("status", payment.getStatus().name());
-        payload.put("amount", payment.getAmount().toString());
+        String payloadJson;
+        try {
+            payloadJson = objectMapper.writeValueAsString(Map.of(
+                    "type", "PaymentCharged",
+                    "version", 1,
+                    "paymentId", payment.getId(),
+                    "subscriptionId", subscription.getId(),
+                    "status", payment.getStatus().name(),
+                    "amount", payment.getAmount().toString(),
+                    "createdAt", payment.getCreatedAt().toString()
+            ));
+        } catch (Exception e) {
+            payloadJson = "{\"type\":\"PaymentCharged\",\"paymentId\":" + payment.getId() + ",\"status\":\"" + payment.getStatus() + "\"}";
+        }
+
         outboxRepository.store(
                 OutboxEvent.builder()
                         .aggregateType("Payment")
                         .aggregateId(payment.getId())
-                        .payload("{\"paymentId\":" + payment.getId() + ",\"status\":\"" + payment.getStatus() + "\"}")
+                        .payload(payloadJson)
                         .status("PENDING")
                         .build());
-
     }
 }
