@@ -46,34 +46,44 @@ recurring-payments-api/
 
 ---
 
-## 🧪 Quick Start (Docker)
+## 🐳 Quick Start (Docker Compose)
 
-### 1) 🐘 Start PostgreSQL
+This project is designed to run with **Docker Compose** in two steps: **build → up**. The stack includes:
 
-```bash
-docker run --name recurring-pg -e POSTGRES_PASSWORD=recurring \
-  -e POSTGRES_USER=recurring -e POSTGRES_DB=recurring \
-  -p 5432:5432 -d postgres:16
-```
-
-### 2) 🔑 Set environment
+* `db` – PostgreSQL
+* `app` – Spring Boot app
+* `db-seed` – seeds a default user for dev/testing
 
 ```bash
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/recurring
-export SPRING_DATASOURCE_USERNAME=recurring
-export SPRING_DATASOURCE_PASSWORD=recurring
-# optional:
-# export SERVER_PORT=8080
+# 1) Build images (app + seed)
+docker compose build
+
+# 2) Start everything in background
+docker compose up -d
+
+# 3) Follow application logs
+docker compose logs -f app
+
+# 4) Check seed logs (should finish successfully)
+docker compose logs -f db-seed
 ```
 
-### 3) 🏃 Build & run
+Endpoints after startup:
+
+* App: `http://localhost:8080/`
+* Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+
+Stop & clean:
 
 ```bash
-./mvnw clean package
-java -jar target/recurring-payments-api-0.0.1-SNAPSHOT.jar
+docker compose down        # stop
+docker compose down -v     # stop + remove volumes (resets DB)
 ```
 
-### 4) 🔎 Explore API
+> Changed the code? Rebuild just the app:
+> `docker compose build server && docker compose up -d`
+
+### 🔎 Explore API
 
 * 🧭 Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 * 📜 OpenAPI: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
