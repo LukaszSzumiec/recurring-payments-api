@@ -2,13 +2,13 @@ package com.lukaszszumiec.recurring_payments_api.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.validation.FieldError;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,10 +25,39 @@ public class GlobalExceptionHandler {
     ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         pd.setTitle("Validation failed");
-        var errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(fe -> Map.of("field", fe.getField(), "message", messageOf(fe)))
-                .toList();
-        pd.setProperty("errors", errors);
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    ProblemDetail handleAuth(AuthenticationException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        pd.setTitle("Unauthorized");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        pd.setTitle("Forbidden");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ProblemDetail handleNoResource(NoResourceFoundException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setTitle("Not found");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    ProblemDetail handleResponseStatus(ResponseStatusException ex) {
+        var pd = ProblemDetail.forStatus(ex.getStatusCode());
+        pd.setTitle("Error");
+        pd.setDetail(ex.getReason());
         return pd;
     }
 
@@ -38,9 +67,5 @@ public class GlobalExceptionHandler {
         pd.setTitle("Unexpected error");
         pd.setDetail(ex.getMessage());
         return pd;
-    }
-
-    private String messageOf(FieldError fe) {
-        return fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value";
     }
 }

@@ -6,7 +6,7 @@ WORKDIR /src
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn -q -DskipTests package
+RUN --mount=type=cache,target=/root/.m2 mvn -q -Dmaven.test.skip=true package
 
 # 2) Runtime stage
 FROM eclipse-temurin:24-jre
