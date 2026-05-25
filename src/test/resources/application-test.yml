@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+
+jwt:
+  secret: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" # 64 hex = 32B
+  expiration: 3600
+  refreshExpiration: 2592000
+
+billing:
+  chargeCron: "*/10 * * * * *"
+
+outbox:
+  publish-cron: "*/15 * * * * *"
+  batch-size: 50
